@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"image/color"
 	_ "image/jpeg"
 	"image/png"
 )
@@ -24,17 +25,22 @@ func main() {
 	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
 		for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x += 2 {
 			grayImg.Set(x, y, img.At(x, y))
+			x++
+			grayImg.Set(x, y, color.Black)
+			x++
+			grayImg.Set(x, y, color.Black)
 		}
 	}
 
-	//I'm trying to create a colored image with black stripes, but I'm kinda failing
+	//creates an image with tiny black stripes
 	imagem := image.NewRGBA(img.Bounds())
 	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
-		for x := img.Bounds().Min.X + 1; x < img.Bounds().Max.X; x += 2 {
+		for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
 			imagem.Set(x, y, img.At(x, y))
-		}
-		for x := (img.Bounds().Min.X); x < img.Bounds().Max.X; x += 2 {
-			imagem.Set(x, y, grayImg.At(x, y))
+			x++
+			imagem.Set(x, y, color.Black)
+			x++
+			imagem.Set(x, y, color.Black)
 		}
 	}
 
