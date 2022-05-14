@@ -3,7 +3,6 @@ package main
 import (
 	"image"
 	"log"
-	"net/http"
 	"os"
 
 	_ "image/jpeg"
@@ -11,13 +10,13 @@ import (
 )
 
 func main() {
-	resp, err := http.Get("https://qph.fs.quoracdn.net/main-thumb-78855837-200-lrecovmpceibxumvmwbsjolvvjhntddv.jpeg")
-	checkError(err)
-	defer resp.Body.Close()
 
-	img, _, err := image.Decode(resp.Body)
+	imageFile, err := os.Open(os.Args[1])
+	defer imageFile.Close()
 	checkError(err)
-	log.Printf("Image Type: %T", img)
+
+	img, _, err := image.Decode(imageFile)
+	checkError(err)
 
 	grayImg := image.NewGray(img.Bounds())
 	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
@@ -26,11 +25,24 @@ func main() {
 		}
 	}
 
-	f, err := os.Create("newimage.png")
+	imagem := image.NewRGBA(img.Bounds())
+	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
+		for x := img.Bounds().Min.X + 1; x < img.Bounds().Max.X; x += 2 {
+			imagem.Set(x, y, img.At(x, y))
+		}
+		for x := (img.Bounds().Min.X); x < img.Bounds().Max.X; x += 2 {
+			imagem.Set(x, y, grayImg.At(x, y))
+		}
+	}
+
+	f, err := os.Create("1newimage.png")
+	checkError(err)
+	f2, err := os.Create("2newimage.png")
 	checkError(err)
 	defer f.Close()
 
 	checkError(png.Encode(f, grayImg))
+	checkError(png.Encode(f2, imagem))
 }
 
 func checkError(err error) {
